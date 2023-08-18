@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Parent</title>
+  </head>
+  <body>
+    <button id="openChild">Open Child</button>
+
+    <script>
+      document.getElementById("openChild").addEventListener("click", () => {
+        const childWindow = window.open("child.html", "_blank");
+
+        function handleMessage(event) {
+          // You can whitelist the Origins here
+          // if (event.origin !== "null") {
+          // return;
+          // }
+
+          if (event.data.method === "getUserProfileData") {
+            const userData = {
+              id: event.data.data.id,
+              name: "Yash",
+              email: "yash@a.com",
+            };
+
+            event.source.postMessage(
+              {
+                method: "userProfileData",
+                data: userData,
+                requestId: event.data.requestId,
+              },
+              "*"
+            );
+          }
+        }
+        window.addEventListener("message", handleMessage);
+      });
+    </script>
+  </body>
+</html>

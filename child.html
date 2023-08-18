@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Child</title>
+  </head>
+  <body>
+    <button id="getData">Get User Profile Data</button>
+
+    <script>
+      document.getElementById("getData").addEventListener("click", async () => {
+        async function getData(request) {
+          return new Promise((resolve, reject) => {
+            const requestId = Math.random();
+
+            function handleResponse(event) {
+              if (
+                event.data.method === "userProfileData" &&
+                event.data.requestId === requestId
+              ) {
+                window.removeEventListener("message", handleResponse);
+
+                resolve(event.data.data);
+              }
+            }
+            window.addEventListener("message", handleResponse);
+
+            window.opener.postMessage({ ...request, requestId }, "*");
+          });
+        }
+
+        try {
+          let userProfileData = await getData({
+            method: "getUserProfileData",
+            data: { id: 1234 },
+          });
+          console.log(userProfileData);
+        } catch (error) {
+          console.error("Error ", error);
+        }
+      });
+    </script>
+  </body>
+</html>
